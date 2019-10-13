@@ -1,26 +1,37 @@
-import java.io.DataInputStream;
+import algorithms.UserInputAlgorithm;
+import game.Solver;
+import networking.NetworkHandler;
+
+
 import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.Socket;
+
+import java.util.Scanner;
 
 public class Client {
+
     public static void main(String[] args) {
-        try {
-            Socket socket = new Socket("localhost", 8963);
-            DataInputStream dis = new DataInputStream(socket.getInputStream());
-            DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-            String serverMessage = "";
-            dos.writeUTF("3");
-            Solver solver = new TestSolver( 3);
-            while (!serverMessage.equals("Finished!")){
-                serverMessage = dis.readUTF();
-                solver.fillGrid(serverMessage);
-                System.out.print(serverMessage);
-                dos.writeUTF(solver.makeMove());
-            }
-            System.out.println(dis.readUTF());
-        } catch (IOException e) {
-            e.printStackTrace();
+        NetworkHandler networkHandler = new NetworkHandler();
+        String serverMessage = "";
+        String sizeString = getMapSize(networkHandler.getDos());
+        int size =Integer.valueOf(sizeString);
+        Solver solver = new Solver(size, new UserInputAlgorithm());
+        serverMessage = networkHandler.initializeGame(sizeString);
+        startGame(networkHandler, serverMessage, solver);
+
+    }
+
+    private static void startGame(NetworkHandler networkHandler, String serverMessage, Solver solver) {
+        while (!serverMessage.equals("Finished!")) {
+            System.out.print(serverMessage);
+            serverMessage = networkHandler.tryGetMoveFromClient(serverMessage, solver);
         }
+        System.out.println(serverMessage);
+    }
+
+
+    private static String getMapSize(DataOutputStream dos) {
+        System.out.println("Please enter a single integer as map size:");
+        Scanner scanner = new Scanner(System.in);
+        return scanner.nextLine();
     }
 }
