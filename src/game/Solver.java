@@ -7,6 +7,7 @@ public class Solver {
     private Algorithm algorithm;
     private String[][] grid;
     private int size;
+
     public Solver(int size, Algorithm algorithm){
         this.size = size;
         this.grid = new String[size][size];

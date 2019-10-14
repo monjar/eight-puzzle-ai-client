@@ -1,4 +1,6 @@
-package algorithms;
+package algorithms.search;
+
+import algorithms.Algorithm;
 
 public class BFS implements Algorithm {
     @Override

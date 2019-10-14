@@ -8,17 +8,17 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class NetworkHandler {
-    private Socket socket;
     private DataInputStream dis;
     private DataOutputStream dos;
 
     public NetworkHandler() {
         try {
-            this.socket = new Socket("localhost", 8963);
+            Socket socket = new Socket("localhost", 8963);
             this.dis = new DataInputStream(socket.getInputStream());
             this.dos = new DataOutputStream(socket.getOutputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
+        }
+        catch (IOException e) {
+            this.printCouldNotConnectMessage();
         }
     }
 
@@ -34,27 +34,36 @@ public class NetworkHandler {
             return this.getMoveFromClient(serverMessage, solver);
         }
         catch (IOException e){
-            e.printStackTrace();
+            this.printDisconnectionMessage();
         }
         return null;
     }
 
 
-    public String initializeGame(String sizeString)   {
+    public String initializeGame(int size)   {
         try {
-            this.getDos().writeUTF(sizeString);
+            this.getDos().writeUTF(String.valueOf(size));
             return this.getDis().readUTF();
         } catch (IOException e) {
-            e.printStackTrace();
+            this.printDisconnectionMessage();
         }
         return null;
     }
 
-    public DataInputStream getDis() {
+    private DataInputStream getDis() {
         return dis;
     }
 
-    public DataOutputStream getDos() {
+    private DataOutputStream getDos() {
         return dos;
+    }
+
+    private void printDisconnectionMessage(){
+        System.err.println("Server connection lost!");
+        System.exit(1);
+    }
+    private void printCouldNotConnectMessage(){
+        System.err.println("Couldn't connect to server!");
+        System.exit(1);
     }
 }

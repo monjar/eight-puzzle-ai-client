@@ -1,7 +1,5 @@
 package algorithms;
 
-import algorithms.Algorithm;
-
 import java.util.Scanner;
 
 public class UserInputAlgorithm implements Algorithm {
